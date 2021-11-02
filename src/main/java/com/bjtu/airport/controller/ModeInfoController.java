@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2020-03-01
  */
 @RestController
-@CrossOrigin
 @RequestMapping("/mode-info")
 public class ModeInfoController {
 

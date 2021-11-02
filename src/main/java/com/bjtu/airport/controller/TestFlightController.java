@@ -23,7 +23,6 @@ import java.util.Date;
  * @since 2020-03-01
  */
 @RestController
-@CrossOrigin
 @RequestMapping("/test-flight")
 public class TestFlightController {
 

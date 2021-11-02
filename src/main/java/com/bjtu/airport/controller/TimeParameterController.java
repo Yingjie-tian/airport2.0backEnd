@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/time_parameter")
 public class TimeParameterController {
 

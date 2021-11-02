@@ -35,7 +35,6 @@ import java.util.List;
  */
 
 @RestController
-@CrossOrigin
 @RequestMapping("/user")
 @Api(tags = "用户注册登录API")
 @Slf4j

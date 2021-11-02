@@ -21,7 +21,6 @@ import java.util.Map;
  * @since 2020-03-01
  */
 @RestController
-@CrossOrigin
 @RequestMapping("/statistic-result")
 public class StatisticResultController {
     @Autowired

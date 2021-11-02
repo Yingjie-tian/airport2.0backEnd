@@ -26,7 +26,6 @@ import java.util.*;
  * @Date 2020/11/17 10:31
  */
 @RestController
-@CrossOrigin
 @RequestMapping("/EvaluationResult")
 public class EvaluationResultController {
     @Autowired

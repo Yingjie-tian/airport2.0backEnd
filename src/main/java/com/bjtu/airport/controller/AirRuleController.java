@@ -19,7 +19,6 @@ import java.util.List;
  * @since 2020-03-17
  */
 @RestController
-@CrossOrigin
 @RequestMapping("/air-rule")
 public class AirRuleController {
 

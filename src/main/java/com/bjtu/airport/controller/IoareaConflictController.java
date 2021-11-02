@@ -18,7 +18,6 @@ import java.util.List;
  * @since 2020-03-01
  */
 @RestController
-@CrossOrigin
 @RequestMapping("/ioarea-conflict")
 public class IoareaConflictController {
 

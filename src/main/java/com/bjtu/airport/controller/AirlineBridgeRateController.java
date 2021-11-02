@@ -10,7 +10,6 @@ import java.util.List;
 
 
 @RestController
-@CrossOrigin
 @RequestMapping("/airline_bridgeRate")
 public class AirlineBridgeRateController {
 

@@ -19,7 +19,6 @@ import java.util.List;
  * @since 2020-03-01
  */
 @RestController
-@CrossOrigin
 @RequestMapping("/flight-info")
 public class FlightInfoController {
 

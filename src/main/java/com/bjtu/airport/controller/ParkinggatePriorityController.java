@@ -18,7 +18,6 @@ import java.util.List;
  * @since 2020-11-07
  */
 @RestController
-@CrossOrigin
 @RequestMapping("/parkinggate-priority")
 public class ParkinggatePriorityController {
     @Autowired

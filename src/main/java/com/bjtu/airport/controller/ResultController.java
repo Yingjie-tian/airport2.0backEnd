@@ -26,7 +26,6 @@ import java.util.*;
  * @since 2020-03-01
  */
 @RestController
-@CrossOrigin
 @RequestMapping("/result")
 @Slf4j
 public class ResultController {

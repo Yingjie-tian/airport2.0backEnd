@@ -18,7 +18,6 @@ import java.util.List;
  */
 
 @RestController
-@CrossOrigin
 @RequestMapping("/parking-mdl")
 public class ParkingMdlController {
 

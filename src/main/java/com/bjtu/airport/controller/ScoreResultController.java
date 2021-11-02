@@ -22,7 +22,6 @@ import java.util.Map;
  * @Date 2020/11/17 12:57
  */
 @RestController
-@CrossOrigin
 @RequestMapping("/ScoreResult")
 public class ScoreResultController {
     @Autowired
