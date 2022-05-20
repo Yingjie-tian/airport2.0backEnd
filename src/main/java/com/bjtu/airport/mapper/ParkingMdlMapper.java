@@ -16,6 +16,7 @@ import java.util.List;
  * @author 田英杰
  * @since 2020-12-03
  */
+@Mapper
 @Repository
 public interface ParkingMdlMapper extends BaseMapper<ParkingMdl>{
 

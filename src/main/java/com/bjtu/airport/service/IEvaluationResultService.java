@@ -1,10 +1,13 @@
 package com.bjtu.airport.service;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.bjtu.airport.entity.EvaluationResult;
 import com.bjtu.airport.entity.StatisticResult;
 import com.bjtu.airport.vo.WrapEvaluationResultVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,8 +23,19 @@ public interface IEvaluationResultService extends IService<EvaluationResult> {
 
     List<WrapEvaluationResultVo> getinfoByPage(String flightId, String date);
 
-    R<?> getinfoByPageAndScore(String flightId, String date);
+    R<?> getPageableInfo(Integer flightId, String date,int page,int size);
 
+    R<?> getinfoByPageAndScore(Integer flightId, String date);
+
+    /**
+     * 分页查询
+     * @param flightId
+     * @param date
+     * @param page
+     * @param size
+     * @return
+     */
+    R<?> getInfoByPageAndScore(Integer flightId, String date,int page,int size);
     R<?> getTimePoint();
 
     /**
@@ -33,4 +47,6 @@ public interface IEvaluationResultService extends IService<EvaluationResult> {
     R<?> getStatisticalTables(String startDate, String endDate,String fileName,String userId);
 
     int insertEva(List<EvaluationResult> evaluationResultArray);
+
+
 }

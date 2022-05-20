@@ -1,5 +1,8 @@
 package com.bjtu.airport.vo;
 
+import com.bjtu.airport.entity.vo.BridgeViewVo;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 import java.util.Optional;
 
@@ -66,6 +69,61 @@ public class WrapEvaluationResultVo implements Serializable {
     private Counter constrain7;
     private Counter constrains;
     private String date;
+
+    public WrapEvaluationResultVo(){
+
+    }
+
+    public WrapEvaluationResultVo(BridgeViewVo vo){
+        this.flightId = vo.getFlightId().toString();
+        this.date = vo.getUpdateTime();
+        String model = vo.getModel();
+        String[] split = model.split("#");
+        this.model1 = arraySplit(split,0);
+        this.model2 = arraySplit(split,1);
+        this.model3 =  arraySplit(split,2);
+        this.constrain1 = counterSplit(vo.getC1());
+        this.constrain2 = counterSplit(vo.getC2());
+        this.constrain3 = counterSplit(vo.getC3());
+        this.constrain4 = counterSplit(vo.getC4());
+        this.constrain5 = counterSplit(vo.getC5());
+        this.constrain6 = counterSplit(vo.getC6());
+        this.constrains = counterSplit(vo.getCs());
+    }
+
+    private String arraySplit(String[] arr,int index){
+        try {
+            if (StringUtils.isEmpty(arr[index])) {
+                return "nonegate";
+            }else {
+                return arr[index];
+            }
+           }catch (Exception e){
+            return "nonegate";
+        }
+    }
+
+    private Counter counterSplit(String cons){
+        String[] split = cons.split("#");
+        Counter counter = new Counter();
+       counter.setKey1(getKey(split,0));
+        counter.setKey2(getKey(split,1));
+        counter.setKey3(getKey(split,2));
+        return counter;
+    }
+
+    private int getKey(String[] arr,int index){
+        try {
+           String s= arr[index];
+            if (StringUtils.isNotEmpty(s)) {
+                return Integer.parseInt(s);
+            }else {
+                return 0;
+            }
+        }catch (Exception e){
+            return 0;
+        }
+    }
 
     public String getFlightId() {
         return flightId;

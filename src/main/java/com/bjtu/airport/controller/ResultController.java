@@ -82,6 +82,7 @@ public class ResultController {
 //            System.out.println(e);
 //        }return null;
 //    };
+    // todo
     @RequestMapping("/getUnionResult")
     public List<JSONObject> getUnionResult(@RequestBody Object filenameUseridInfo){
 

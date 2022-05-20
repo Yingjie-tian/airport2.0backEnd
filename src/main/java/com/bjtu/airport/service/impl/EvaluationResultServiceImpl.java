@@ -1,18 +1,18 @@
 package com.bjtu.airport.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.api.R;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.bjtu.airport.component.AsyncStatisticHandler;
 import com.bjtu.airport.entity.EvaluationResult;
 import com.bjtu.airport.entity.Result;
-import com.bjtu.airport.entity.vo.BridgeCount;
-import com.bjtu.airport.entity.vo.ConstrainsStatistic;
-import com.bjtu.airport.entity.vo.ConstraintSum;
-import com.bjtu.airport.entity.vo.LinePointNode;
+import com.bjtu.airport.entity.vo.*;
 import com.bjtu.airport.mapper.EvaluationResultMapper;
 import com.bjtu.airport.mapper.ResultMapper;
 import com.bjtu.airport.service.IEvaluationResultService;
 import com.bjtu.airport.utils.CollectionUtil;
+import com.bjtu.airport.utils.FakeUtil;
 import com.bjtu.airport.vo.WrapEvaluationResultVo;
 import static com.bjtu.airport.utils.NumberUtil.*;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +22,8 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -41,7 +43,9 @@ public class EvaluationResultServiceImpl extends ServiceImpl<EvaluationResultMap
     private EvaluationResultMapper evaluationResultMapper;
 
     @Autowired
-    private ResultMapper resultMapper;
+    private AsyncStatisticHandler asyncStatisticHandler;
+
+
     //2020.11.17 查询EVALUATION_RESULT的数据
     @Override
     public List<EvaluationResult> getinfo() {
@@ -80,6 +84,33 @@ public class EvaluationResultServiceImpl extends ServiceImpl<EvaluationResultMap
         return voList;
     }
 
+    @Override
+    public  R<?> getPageableInfo(Integer flightId, String date, int page, int size) {
+        if (StringUtils.isEmpty(date)){
+            date =  evaluationResultMapper.selectNewestTime();
+        }
+
+        Page<BridgeViewVo> pageable = new Page<>(page,size);  // 查询第1页，每页返回5条
+        EvaluationResult er = new EvaluationResult();
+        er.setUpdateTime(date);
+        if (flightId != null){
+            er.setFlightId(flightId);
+        }
+        IPage<BridgeViewVo> iPage = baseMapper.page(pageable, er);
+        List<BridgeViewVo> records = iPage.getRecords();
+        Page<WrapEvaluationResultVo> wrappedPage = new Page<>();
+        wrappedPage.setTotal(iPage.getTotal());
+        wrappedPage.setRecords(castRecords(records));
+        wrappedPage.setCurrent(iPage.getCurrent());
+        wrappedPage.setPages(iPage.getPages());
+        wrappedPage.setSize(iPage.getSize());
+        return R.ok(wrappedPage);
+    }
+
+    private List<WrapEvaluationResultVo> castRecords(List<BridgeViewVo> records){
+        return  records.stream().map(WrapEvaluationResultVo::new).collect(Collectors.toList());
+    }
+
     private WrapEvaluationResultVo handleResolveEvaluationResult(EvaluationResult o,WrapEvaluationResultVo vo){
         //2021.3.26改动
 //        WrapEvaluationResultVo vo = new WrapEvaluationResultVo();
@@ -104,9 +135,6 @@ public class EvaluationResultServiceImpl extends ServiceImpl<EvaluationResultMap
         if (vo.getConstrain6() == null) {
             vo.setConstrain6(new WrapEvaluationResultVo.Counter());
         }
-//                if (vo.getConstrain7() == null) {
-//                    vo.setConstrain7(new WrapEvaluationResultVo.Counter());
-//                }
         if (vo.getConstrains() == null) {
             vo.setConstrains(new WrapEvaluationResultVo.Counter());
         }
@@ -121,42 +149,49 @@ public class EvaluationResultServiceImpl extends ServiceImpl<EvaluationResultMap
             vo.setConstrain4(vo.getConstrain4().setKey1(o.getConstraint4()));
             vo.setConstrain5(vo.getConstrain5().setKey1(o.getConstraint5()));
             vo.setConstrain6(vo.getConstrain6().setKey1(o.getConstraint6()));
-//          vo.setConstrain7(vo.getConstrain7().setKey1(o.getConstraint7()));
             vo.setConstrains(vo.getConstrains().setKey1(o.getConstraints()));
         }
         if (o.getModel().equals("1")) {
            vo.setModel2(o.getParkinggate());
-//            vo.setModel2(getIntFromString(o.getParkinggate()).toString());
             vo.setConstrain1(vo.getConstrain1().setKey2(o.getConstraint1()));
             vo.setConstrain2(vo.getConstrain2().setKey2(o.getConstraint2()));
             vo.setConstrain3(vo.getConstrain3().setKey2(o.getConstraint3()));
             vo.setConstrain4(vo.getConstrain4().setKey2(o.getConstraint4()));
             vo.setConstrain5(vo.getConstrain5().setKey2(o.getConstraint5()));
             vo.setConstrain6(vo.getConstrain6().setKey2(o.getConstraint6()));
-//                    vo.setConstrain7(vo.getConstrain7().setKey2(o.getConstraint7()));
             vo.setConstrains(vo.getConstrains().setKey2(o.getConstraints()));
         }
         if (o.getModel().equals("2")) {
             vo.setModel3(o.getParkinggate());
-//            vo.setModel3(getIntFromString(o.getParkinggate()).toString());
             vo.setConstrain1(vo.getConstrain1().setKey3(o.getConstraint1()));
             vo.setConstrain2(vo.getConstrain2().setKey3(o.getConstraint2()));
             vo.setConstrain3(vo.getConstrain3().setKey3(o.getConstraint3()));
             vo.setConstrain4(vo.getConstrain4().setKey3(o.getConstraint4()));
             vo.setConstrain5(vo.getConstrain5().setKey3(o.getConstraint5()));
             vo.setConstrain6(vo.getConstrain6().setKey3(o.getConstraint6()));
-//                    vo.setConstrain7(vo.getConstrain7().setKey3(o.getConstraint7()));
             vo.setConstrains(vo.getConstrains().setKey3(o.getConstraints()));
         }
         return vo;
     }
 
     @Override
-    public R<?> getinfoByPageAndScore(String flightId, String date) {
+    public R<?> getinfoByPageAndScore(Integer flightId, String date) {
         Map<String,Object> map=new HashMap<>();
-        map.put("data1",getinfoByPage(flightId,date));
+        String sfid = null;
+        if (flightId != null){
+            sfid = flightId.toString();
+        }
+        map.put("data1",getinfoByPage(sfid,date));
+        //2
         map.put("data2", getinfo());
         return R.ok(map);
+    }
+
+    @Override
+    public R<?> getInfoByPageAndScore(Integer flightId, String date, int page, int size) {
+
+
+        return null;
     }
 
     @Override
@@ -208,48 +243,77 @@ public class EvaluationResultServiceImpl extends ServiceImpl<EvaluationResultMap
         return R.ok(result);
     }
 
+    // todo check statistics data
     @Override
     public R<?> getStatisticalTables(String startDate, String endDate,String fileName,String userId) {
 
         Map<String,Object> result = new HashMap<>();
-        Future<List<Object[]>> bridgeRateFuture = getBridgeRate(startDate, endDate,fileName,userId);
-        List<Object[]> br = null;
+        Future<Map<String ,Object>> brFuture = asyncStatisticHandler.getBridgeRateMap(startDate, endDate,fileName,
+                userId);
+        Map<String,Object> bm = null;
         try{
-            br = bridgeRateFuture.get();
+            bm = brFuture.get();
         } catch (InterruptedException  | ExecutionException e) {
-            br = new ArrayList<>();
+            bm = new HashMap<>();
+            if ( StringUtils.isNoneEmpty(startDate,endDate)){
+                bm.put("xAxis",Collections.singletonList(new XAixsNode<>("category", FakeUtil.fakeXAxis(startDate,endDate))));
+            }else {
+                LocalDate today = LocalDate.now();
+                bm.put("xAxis",Collections.singletonList(new XAixsNode<>("category",
+                        FakeUtil.fakeXAxis(today.minusDays(30), today))));
+            }
             log.error("获取靠桥率统计图失败");
         }
-        result.put("bridgeRate",br);
+        result.put("bridgeRate",bm);
 
-
-        List<Object[]> csList = null;
-        Future<List<Object[]>> csFuture = getConstainsCount(startDate, endDate, fileName, userId);
+        Future<Map<String ,Object>> csFutureMap = asyncStatisticHandler.getConstainsCountMap(startDate, endDate,fileName,userId);
+        Map<String,Object> cm = null;
         try{
-            csList = csFuture.get();
+            cm = csFutureMap.get();
         } catch (InterruptedException  | ExecutionException e) {
-            csList = new ArrayList<>();
+            cm = new HashMap<>();
+            if ( StringUtils.isNoneEmpty(startDate,endDate)){
+                cm.put("xAxis",Collections.singletonList(new XAixsNode<>("category", FakeUtil.fakeXAxis(startDate,endDate))));
+            }else {
+                LocalDate today = LocalDate.now();
+                cm.put("xAxis",Collections.singletonList(new XAixsNode<>("category",
+                        FakeUtil.fakeXAxis(today.minusDays(30), today))));
+            }
            log.error("获取违反约束统计图失败");
         }
-        result.put("constainsCount",csList);
+        result.put("constainsCount",cm);
 
 
         Map<String, Object> ar = null;
-        Future<Map<String, Object>> arFuture = getAgreementRate(startDate, endDate, fileName, userId);
+        Future<Map<String, Object>> arFuture = asyncStatisticHandler.getAgreementRate(startDate, endDate, fileName, userId);
         try {
             ar = arFuture.get();
         }catch (InterruptedException  | ExecutionException e) {
             ar = new HashMap<>();
+            if ( StringUtils.isNoneEmpty(startDate,endDate)){
+                ar.put("xAxis",Collections.singletonList(new XAixsNode<>("category", FakeUtil.fakeXAxis(startDate,endDate))));
+            }else {
+                LocalDate today = LocalDate.now();
+                ar.put("xAxis",Collections.singletonList(new XAixsNode<>("category",
+                        FakeUtil.fakeXAxis(today.minusDays(30), today))));
+            }
             log.error("获取一致性统计图失败");
         }
         result.put("agreementRate",ar);
 
         Map<String ,Object> pcc = null;
-        Future<Map<String ,Object>>  pccFuture =  getPerConstrainCount(startDate, endDate, fileName, userId);
+        Future<Map<String ,Object>>  pccFuture =  asyncStatisticHandler.getPerConstrainCount(startDate, endDate, fileName, userId);
         try {
             pcc = pccFuture.get();
         }catch (InterruptedException  | ExecutionException e) {
             pcc = new HashMap<>();
+            if ( StringUtils.isNoneEmpty(startDate,endDate)){
+                pcc.put("xAxis",Collections.singletonList(new XAixsNode<>("category", FakeUtil.fakeXAxis(startDate,endDate))));
+            }else {
+                LocalDate today = LocalDate.now();
+                pcc.put("xAxis",Collections.singletonList(new XAixsNode<>("category",
+                        FakeUtil.fakeXAxis(today.minusDays(30), today))));
+            }
             log.error("获取违反约束统计次数失败");
         }
         result.put("perConstrainCount",pcc);
@@ -258,178 +322,6 @@ public class EvaluationResultServiceImpl extends ServiceImpl<EvaluationResultMap
 
 
 
-    @Async
-    Future<List<Object[]>> getBridgeRate(String startDate, String endDate,String fileName,String userId){
-        List<BridgeCount> countList =  resultMapper.selectBridgeData(startDate,endDate,fileName,userId);
-        if (countList.isEmpty()){
-            return  new AsyncResult<>(new ArrayList<>());
-        }
-        Map<String, List<BridgeCount>> collect = countList.stream().collect(Collectors.groupingBy(BridgeCount::getTimePoint, LinkedHashMap::new,
-                Collectors.toList()));
-        List<Object[]> dataList = new ArrayList<>();
-        dataList.add(new Object[]{"product", "human", "model1", "model2"});
-        collect.forEach((k,v)->{
-            Object[] arr = getNewObjectArray();
-            arr[0]=k;
-            v.forEach(e->{
-                if (e.getModel().equals("0")){
-
-                    arr[1] = save2Decimal(gdd(e.getBridgeLines())/gdd(e.getAllLines()));
-                }
-                if (e.getModel().equals("1")){
-                    arr[2] = save2Decimal(gdd(e.getBridgeLines())/gdd(e.getAllLines()));
-                }
-                if (e.getModel().equals("2")){
-                    arr[3] = save2Decimal(gdd(e.getBridgeLines())/gdd(e.getAllLines()));
-                }
-            });
-            dataList.add(arr);
-        });
-        return new AsyncResult<>(dataList);
-    }
-
-    private Double save2Decimal(double val){
-       return Double.parseDouble(String.format("%.2f", val));
-    }
-    @Async
-    Future<List<Object[]>> getConstainsCount(String startDate, String endDate,String fileName,String userId){
-        //todo 表updateTime不能为空
-        List<ConstrainsStatistic> list = evaluationResultMapper.getConstainsCount(startDate,endDate,fileName,userId);
-        if (list.isEmpty()){
-            return new AsyncResult<>(new ArrayList<>());
-        }
-        //x轴
-        Map<String, List<ConstrainsStatistic>> collect = list
-                .stream()
-                .collect(Collectors.groupingBy(ConstrainsStatistic::getTimePoint,LinkedHashMap::new, Collectors.toList()));
-        List<Object[]> dataList = new ArrayList<>();
-        dataList.add(new Object[]{"product", "human", "model1", "model2"});
-        collect.forEach((k,v)->{
-            Object[] arr = getNewObjectArray();
-            arr[0]=k;
-            v.forEach(e->{
-                if (e.getModel().equals("0")){
-                    arr[1] = e.getConstrainsCount();
-                }
-                if (e.getModel().equals("1")){
-                    arr[2] = e.getConstrainsCount();
-                }
-                if (e.getModel().equals("2")){
-                    arr[3] = e.getConstrainsCount();
-                }
-            });
-            dataList.add(arr);
-        });
-        return new AsyncResult<>(dataList);
-    }
-    private Object[] getNewObjectArray(){
-        return new Object[]{"",0,0,0};
-    }
-
-    @Async
-    Future<Map<String,Object>> getAgreementRate(String startDate, String endDate,String fileName,String userId){
-        //todo 每条数据的 flightid  与 parkinggate 都不能为空
-        //todo 表updateTime不能为空
-        Map<String,Object> result = new HashMap<>();
-        result.put("xAxis",new ArrayList<>());
-        result.put("series",new ArrayList<>());
-        List<Result> resultList =  resultMapper.getResultForAgreementRate(startDate,endDate,fileName,userId);
-        if (resultList.isEmpty()){
-            return new AsyncResult<>(result);
-        }
-        //此处获取updateTime为空  抛出异常
-        Map<String, List<Result>> collect = resultList
-                .stream()
-                //2021.3.23过滤掉空数据  这样不会产生异常  但是数据会少，如果数据无误可以屏蔽掉下一行
-                .filter(e->StringUtils.isNotEmpty(e.getUpdateTime()))
-                .collect(Collectors.groupingBy(Result::getUpdateTime,LinkedHashMap::new, Collectors.toList()));
-        Set<String> xAxis = collect.keySet();
-        result.put("xAxis",xAxis);
-        LinePointNode<Double> node1 = new LinePointNode<>("model1");
-        LinePointNode<Double> node2 = new LinePointNode<>("model2");
-        collect.forEach((k,v)->{
-            Set<String> collect0 = v.stream()
-                    .filter(e -> e.getModel().equals("0"))
-                    .map(e-> e.getFlightId() + ":" + e.getParkinggate())
-                    .collect(Collectors.toSet());
-            Set<String> collect1 = v.stream()
-                    .filter(e -> e.getModel().equals("1"))
-                    .map(e-> e.getFlightId() + ":" + e.getParkinggate())
-                    .collect(Collectors.toSet());
-            Set<String> collect2 = v.stream()
-                    .filter(e -> e.getModel().equals("2"))
-                    .map(e-> e.getFlightId() + ":" + e.getParkinggate())
-                    .collect(Collectors.toSet());
-            if (collect0.isEmpty()){
-                node1.getData().add(0d);
-                node2.getData().add(0d);
-            }else {
-                //比较0  1
-                if (!collect1.isEmpty()){
-                    double v1 = CollectionUtil.compareSame(collect0, collect1);
-                    node1.getData().add(v1);
-                }else {
-                    node1.getData().add(0d);
-                }
-                //比较0  2
-                if (!collect2.isEmpty()){
-                    double v2 = CollectionUtil.compareSame(collect0, collect2);
-                    node2.getData().add(v2);
-                }else {
-                    node2.getData().add(0d);
-                }
-            }
-        });
-
-        result.put("series",Arrays.asList(node1,node2));
-        return new AsyncResult<>(result);
-    }
-
-    @Async
-    Future<Map<String ,Object>> getPerConstrainCount(String startDate, String endDate,String fileName,String userId){
-        //todo 表updateTime不能为空
-        Map<String ,Object> result = new HashMap<>();
-        List<ConstraintSum> sumList  = evaluationResultMapper.getFlightConstraintSum(startDate,endDate,fileName,userId);
-        result.put("series",transferObj2IntArrSeries(sumList));
-        if (sumList.isEmpty()){
-            return new AsyncResult<>(result);
-        }
-        List<LinePointNode<Integer>> series = transferObj2IntArrSeries(sumList);
-        result.put("series",series);
-        return new AsyncResult<>(result);
-    }
-
-
-    private List<LinePointNode<Integer>>  transferObj2IntArrSeries( List<ConstraintSum>  list){
-        List<LinePointNode<Integer>>  resList = new ArrayList<>();
-        for (int i = 0;i<3;i++){
-            List<Integer> intList = new ArrayList<>();
-            LinePointNode<Integer> node = null;
-            if (i == 0){
-                node = new LinePointNode<>("human");
-            }
-            if (i == 1){
-                node = new LinePointNode<>("model1");
-            }
-            if (i == 2){
-                node = new LinePointNode<>("model2");
-            }
-            try {
-                ConstraintSum o = list.get(i);
-                intList.add(o.getConstraint1());
-                intList.add(o.getConstraint2());
-                intList.add(o.getConstraint3());
-                intList.add(o.getConstraint4());
-                intList.add(o.getConstraint5());
-                intList.add(o.getConstraint6());
-                node.setData(intList);
-            } catch (Exception e){
-                node.setData(Arrays.asList(0,0,0,0,0,0));
-            }
-            resList.add(node);
-        }
-        return resList;
-    }
 
     @Override
     public int insertEva(List<EvaluationResult> evaluationResultArray){
@@ -442,7 +334,10 @@ public class EvaluationResultServiceImpl extends ServiceImpl<EvaluationResultMap
             sum = sum + row;
         }
         return sum;
-    };
+    }
+
+
+
 
 
 }

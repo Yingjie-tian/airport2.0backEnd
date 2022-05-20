@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 
+@Mapper
 @Repository
 public interface TimeParameterMapper extends BaseMapper<TimeParameter> {
 

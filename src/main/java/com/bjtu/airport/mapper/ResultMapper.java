@@ -22,6 +22,7 @@ import java.util.List;
  * @author WuZhen
  * @since 2020-03-01
  */
+@Mapper
 @Repository
 public interface ResultMapper extends BaseMapper<Result> {
     //查询result表(改2020/3/31)
@@ -40,13 +41,13 @@ public interface ResultMapper extends BaseMapper<Result> {
 
     /**
      * 根据文件名和用户id联合查询
+     *  todo
+     *  KEY `idx_fid_fname_uid_m_t` (`flightId`,`filename`,`userId`,`model`,`updateTime`) USING BTREE
+     *  create index `idx_fid_fname_uid_m_t` on `RESULT`(`flightId`,`filename`,`userId`,`model`,`updateTime`) USING BTREE
      * @param filename
      * @param userId
      * @return
      */
-//    @Select("SELECT FLIGHT_INFO.id,RESULT.filename,RESULT.model,RESULT.flightId,RESULT.allostate,RESULT.parkinggate,RESULT.userId, RESULT.updateTime,FLIGHT_INFO.isvip,FLIGHT_INFO.business,FLIGHT_INFO.paras,FLIGHT_INFO.atime,FLIGHT_INFO.dtime,FLIGHT_INFO.nation,FLIGHT_INFO.mdl,FLIGHT_INFO.planenum,FLIGHT_INFO.aflightnum,FLIGHT_INFO.dflightnum,FLIGHT_INFO.origin,FLIGHT_INFO.airportname,FLIGHT_INFO.destination,concat(FLIGHT_INFO.aflightnum,'/',FLIGHT_INFO.dflightnum) as flightnum ,concat(FLIGHT_INFO.origin,'-',FLIGHT_INFO.airportname,'-',FLIGHT_INFO.destination) as flightline  FROM RESULT,FLIGHT_INFO \n" +
-//            "WHERE FLIGHT_INFO.id = RESULT.flightId AND RESULT.filename = #{filename} AND RESULT.userId = #{userId} AND RESULT.model = #{model}")
-//    List<JSONObject> getUnionResult(@Param("filename") String filename, @Param("userId") String userId,@Param("model") String model);
     List<JSONObject> getUnionResult(@Param("filename") String filename,
                                     @Param("userId") String userId,
                                     @Param("model") String model);

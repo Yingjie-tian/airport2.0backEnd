@@ -1,8 +1,11 @@
 package com.bjtu.airport.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.bjtu.airport.entity.EvaluationResult;
 import com.bjtu.airport.entity.StatisticResult;
+import com.bjtu.airport.entity.vo.BridgeViewVo;
 import com.bjtu.airport.entity.vo.ConstrainsStatistic;
 import com.bjtu.airport.entity.vo.ConstraintSum;
 import net.sf.json.JSONArray;
@@ -69,4 +72,8 @@ public interface EvaluationResultMapper extends BaseMapper<EvaluationResult> {
 
     @Select(value = "select DISTINCT(score),model from EVALUATION_RESULT where userId=#{userid} and filename=#{filename} and updateTime=#{updatetime} ORDER BY model")
     List<EvaluationResult> selectScore(@Param("userid") String userid, @Param("filename") String filename, @Param("updatetime") String updatetime);
+
+
+    IPage<BridgeViewVo> page(@Param("page")IPage<BridgeViewVo> page,
+                                @Param("er")EvaluationResult er);
 }

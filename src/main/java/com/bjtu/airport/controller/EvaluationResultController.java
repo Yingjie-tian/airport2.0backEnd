@@ -2,12 +2,11 @@ package com.bjtu.airport.controller;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.extension.api.R;
-import com.bjtu.airport.entity.EvaluationResult;
 import com.bjtu.airport.service.IEvaluationResultService;
-import com.bjtu.airport.service.IScoreResultService;
 import com.bjtu.airport.vo.WrapEvaluationPoiResultVo;
 import com.bjtu.airport.vo.WrapEvaluationResultVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -30,12 +30,16 @@ import java.util.*;
 public class EvaluationResultController {
     @Autowired
     private IEvaluationResultService evaluationResultService;
+
     //2020.11.17 查询EVALUATION_RESULT的数据
 
+    //todo 分页
     @GetMapping("/test")
-    public R<?> test(@RequestParam(value = "flightId", defaultValue = "") String flightId,
-                     @RequestParam(value = "date", defaultValue = "") String date) {
-        return evaluationResultService.getinfoByPageAndScore(flightId, date);
+    public R<?> test(@RequestParam(value = "flightId", required = false) Integer flightId,
+                     @RequestParam(value = "date", defaultValue = "") String date,
+                     @RequestParam(value = "page",defaultValue = "1")Integer page,
+                     @RequestParam(value = "size",defaultValue = "10")Integer size) {
+        return evaluationResultService.getPageableInfo(flightId, date,page,size);
     }
 
 
@@ -47,7 +51,6 @@ public class EvaluationResultController {
 
     @GetMapping("/testDownload")
     public void templateExcelDownload(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        System.out.println("yyyy");
         //文件目录+名字
         String filePath = "/test/";
         String fileName = "excludeOrIncludeWrite" + System.currentTimeMillis() + ".xlsx";
@@ -83,8 +86,8 @@ public class EvaluationResultController {
     }
 
     @GetMapping("/getStatisticalTables")
-    public R<?> getStatisticalTables(@RequestParam(value = "startDate",required = false,defaultValue = "") String startDate,
-                                     @RequestParam(value = "endDate",required = false,defaultValue = "") String endDate,
+    public R<?> getStatisticalTables(@RequestParam(value = "startDate",defaultValue = "") String startDate,
+                                     @RequestParam(value = "endDate",defaultValue = "")  String endDate,
                                      @RequestParam(value = "filename",required = false,defaultValue = "")String fileName,
                                      @RequestParam(value = "userid",required = false,defaultValue = "")String userId) {
         return evaluationResultService.getStatisticalTables(startDate, endDate,fileName,userId);

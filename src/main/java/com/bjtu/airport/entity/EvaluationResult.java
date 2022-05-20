@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.beans.Transient;
 import java.io.Serializable;
 
 /**
@@ -56,13 +57,33 @@ public class EvaluationResult implements Serializable {
     private Integer runnums;
 
     private String userId;
-    
+
 
     @TableField("updateTime")
     private String updateTime;
     @TableField("testtime")
     private String testtime;
 
+    /**
+     * 以下字段已禁止序列化不可写入表
+     */
+    @TableField(exist = false)
+    private String c1;
+    @TableField(exist = false)
+    private String c2;
+    @TableField(exist = false)
+    private String c3;
+    @TableField(exist = false)
+    private String c4;
+    @TableField(exist = false)
+    private String c5;
+    @TableField(exist = false)
+    private String c6;
+    @TableField(exist = false)
+    private String cs;
+
+    public EvaluationResult() {
+    }
 }
 
 

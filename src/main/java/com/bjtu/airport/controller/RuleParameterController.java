@@ -17,7 +17,6 @@ import java.util.List;
  *
  * @author WuZhen
  * @since 2020-03-01
- * commit_test
  */
 @RestController
 @RequestMapping("/rule-parameter")

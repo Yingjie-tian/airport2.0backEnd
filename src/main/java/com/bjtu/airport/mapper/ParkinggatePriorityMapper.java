@@ -4,6 +4,7 @@ import com.bjtu.airport.entity.ParkinggatePriority;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import net.sf.json.JSONObject;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
@@ -18,6 +19,7 @@ import java.util.List;
  * @author ChenYakun
  * @since 2020-11-07
  */
+@Mapper
 @Repository
 public interface ParkinggatePriorityMapper extends BaseMapper<ParkinggatePriority> {
 

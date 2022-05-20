@@ -17,6 +17,7 @@ import java.util.Map;
  * @author WuZhen
  * @since 2020-03-01
  */
+@Mapper
 @Repository
 public interface TestFlightMapper extends BaseMapper<TestFlight> {
 

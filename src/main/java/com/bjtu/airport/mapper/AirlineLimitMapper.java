@@ -15,6 +15,7 @@ import java.util.List;
  * @author WuZhen
  * @since 2020-03-01
  */
+@Mapper
 @Repository
 public interface AirlineLimitMapper extends BaseMapper<AirlineLimit> {
 

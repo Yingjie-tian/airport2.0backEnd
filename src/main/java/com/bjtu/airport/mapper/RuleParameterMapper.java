@@ -2,10 +2,7 @@ package com.bjtu.airport.mapper;
 
 import com.bjtu.airport.entity.RuleParameter;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,6 +15,7 @@ import java.util.List;
  * @author WuZhen
  * @since 2020-03-01
  */
+@Mapper
 @Repository
 public interface RuleParameterMapper extends BaseMapper<RuleParameter> {
 

@@ -16,6 +16,7 @@ import java.util.List;
  * @author WuZhen
  * @since 2020-03-17
  */
+@Mapper
 @Repository
 public interface AirRuleMapper extends BaseMapper<AirRule> {
 

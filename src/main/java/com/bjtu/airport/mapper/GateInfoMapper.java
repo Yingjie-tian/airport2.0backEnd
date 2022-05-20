@@ -15,7 +15,7 @@ import java.util.List;
  * @author WuZhen
  * @since 2020-03-01
  */
-
+@Mapper
 @Repository
 public interface GateInfoMapper extends BaseMapper<GateInfo> {
     //查询GATE_INFO表中所有数据
@@ -48,6 +48,13 @@ public interface GateInfoMapper extends BaseMapper<GateInfo> {
                    @Param("parkinggate") String parkinggate);
 
     //根据所选测试数据筛选机位
+
+    /**
+     * TODO 添加索引  KEY `idx_aname` (`airportname`) USING BTREE
+     * create index `idx_aname` on `GATE_INFO`(`airportname`) USING BTREE
+     * @param airportname
+     * @return
+     */
     @Select("select *  from GATE_INFO where airportname= #{airportname}")
     List<GateInfo> getinfo2(@Param("airportname") String airportname);
 
