@@ -274,13 +274,13 @@
            sum(constraints) as constrainsCount,model,date(updateTime ) as timePoint
         from EVALUATION_RESULT
         <where>
-            <if test="startDate != '' and endDate != '' ">
+            <if test="startDate != null and startDate != '' and endDate != null and endDate != '' ">
                 (date(updateTime) BETWEEN #{startDate} and #{endDate})
             </if>
-            <if test="fileName != '' ">
+            <if test="fileName != null and fileName != '' ">
                 and filename = #{fileName}
             </if>
-            <if test="userId != '' ">
+            <if test="userId != null and userId != '' ">
                 and userId = #{userId}
             </if>
         </where>
@@ -295,18 +295,40 @@
             model
          from EVALUATION_RESULT
         <where>
-            <if test="startDate != '' and endDate != '' ">
+            <if test="startDate != null and startDate != '' and endDate != null and endDate != '' ">
                 (date(updateTime) BETWEEN #{startDate} and #{endDate})
             </if>
 
-            <if test="fileName != '' ">
+            <if test="fileName != null and fileName != '' ">
                 and filename = #{fileName}
             </if>
-            <if test="userId != '' ">
+            <if test="userId != null and userId != '' ">
                 and userId = #{userId}
             </if>
         </where>
         group by model
         order by model
+    </select>
+    <select id="page" resultType="com.bjtu.airport.entity.vo.BridgeViewVo">
+         select flightId,
+            group_concat(parkinggate order by model asc SEPARATOR '#') as model,
+            group_concat(constraint1 SEPARATOR '#') as c1,
+            group_concat(constraint2 SEPARATOR '#') as c2,
+            group_concat(constraint3 SEPARATOR '#') as c3,
+            group_concat(constraint4 SEPARATOR '#') as c4,
+            group_concat(constraint5 SEPARATOR '#') as c5,
+            group_concat(constraint6 SEPARATOR '#') as c6,
+            group_concat(`constraints` SEPARATOR '#') as cs,
+            updateTime
+            from EVALUATION_RESULT
+            <where>
+                updateTime = #{er.updateTime}
+                <if test="er.flightId != null">
+                    and flightId = #{er.flightId}
+                </if>
+            </where>
+            group by flightId
+            order by flightId
+
     </select>
 </mapper>

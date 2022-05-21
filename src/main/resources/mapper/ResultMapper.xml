@@ -25,13 +25,13 @@
         id, filename, model, flightid, allostate, parkinggate, runnums, testtime, userId,date(updateTime)  as updateTime
         from RESULT
         <where>
-            <if test="startDate != '' and endDate != '' ">
+            <if test="startDate != null and startDate != '' and endDate != null and endDate != '' ">
                 ( date(updateTime) BETWEEN #{startDate} and #{endDate} )
             </if>
-            <if test="fileName != '' ">
+            <if test="fileName != null and fileName != '' ">
                 and filename = #{fileName}
             </if>
-            <if test="userId != '' ">
+            <if test="userId != null and userId != '' ">
                 and userId = #{userId}
             </if>
         </where>
@@ -79,9 +79,9 @@
         from RESULT t1
         inner join GATE_INFO t2
         on  t1.parkinggate = t2.parkinggate
-        and  date(t1.updateTime) = date(t2.updateTime)
+        and  t1.updateTime = t2.updateTime
         <where>
-            <if test="startDate != '' and endDate != '' ">
+            <if test="startDate != null and startDate != '' and endDate != '' and endDate != null">
                 ( date(t1.updateTime) BETWEEN #{startDate} and #{endDate} )
             </if>
             <if test="fileName != '' ">
@@ -120,11 +120,12 @@
         t1.destination,
         concat(t1.aflightnum,'/',t1.dflightnum) as flightnum ,
         concat(t1.origin,'-',t1.airportname,'-',t1.destination) as flightline
-        FROM RESULT t2,FLIGHT_INFO t1
+        FROM RESULT t2
+        INNER JOIN FLIGHT_INFO t1
+        ON t1.id = t2.flightId
         <where>
-            t1.id = t2.flightId
             <if test="filename != '' and filename != null ">
-                AND t2.filename = #{filename}
+               t2.filename = #{filename}
             </if>
             <if test="userId != '' and userId != null">
                 AND t2.userId = #{userId}
@@ -133,12 +134,14 @@
             <if test="model != '' and model != null ">
                 AND t2.model = #{model}
             </if>
-            and t2.updateTime = ( select max(updateTime)
+            and t2.updateTime = (
+            select max(updateTime)
             from RESULT
-            WHERE model = t2.model
+            WHERE
+            flightId=t2.flightId
             and filename=t2.filename
             and userId = t2.userId
-            and flightId=t2.flightId
+            AND model = t2.model
             )
         </where>
     </select>
